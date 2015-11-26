@@ -1,0 +1,18 @@
+---
+- name: checkout phalcon repository
+  git: repo=https://github.com/phalcon/cphalcon.git version=master dest=/vagrant/cphalcon accept_hostkey=yes force=yes
+
+- name: build phalcon
+  action: command {{ item }} chdir=/vagrant/cphalcon/build
+  with_items:
+    - bash install
+
+- name: copy phalcon.ini
+  copy: src=phalcon.ini dest=/etc/php5/mods-available/phalcon.ini owner=root group=root mode=0644
+
+- name: enable phalcon
+  action: command {{ item }}
+  with_items:
+    - php5enmod phalcon
+  notify: restart php5-fpm
+  ignore_errors: True

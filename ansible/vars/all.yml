@@ -1,0 +1,35 @@
+---
+server:
+    install: '1'
+    packages: [htop, vim, git]
+    timezone: UTC
+    locale: en_US.UTF-8
+vagrant_local:
+    install: '1'
+    vm: { base_box: trusty64, hostname: phalcontest.dev, ip: 192.168.33.100, memory: '2048', sharedfolder: ./, useVagrantCloud: '1', syncType: nfs }
+apache:
+    install: '1'
+    docroot: /vagrant/site
+    servername: phalcontest.dev
+mariadb:
+    install: '1'
+    root_password: '123'
+    database: phalcon
+    user: phalcon
+    password: '123'
+    dump: phalcon.sql
+beanstalkd:
+    install: '1'
+    listenAddress: 0.0.0.0
+    listenPort: '13000'
+    version: '1.10'
+    user: beanstalkd
+    persistent: 'yes'
+    storage: /var/lib/beanstalkd
+php:
+    install: '1'
+    ppa: php5-5.6
+    packages: [php5-cli, php5-intl, php5-dev, php5-mcrypt, php5-curl, php5-imagick, php5-memcached, php5-mysql]
+xdebug:
+    install: '1'
+

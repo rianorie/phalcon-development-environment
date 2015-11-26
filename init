@@ -1,0 +1,73 @@
+#!/bin/bash
+
+IP=`grep config.vm.network Vagrantfile | sed 's/.\+ip: "\([0-9.]\+\)"/\1/g'`
+
+printf "Setting up Phalcon development environment.\n"
+
+git clone https://github.com/phalcon/incubator.git
+
+git clone https://github.com/phalcon/phalcon-devtools.git
+ln -s phalcon-devtools/phalcon.php phalcon
+
+printf "\n\nYou can skip any of the questions by simply hitting enter\n\n"
+
+read -e -p "Enter the URL to your fork of the phalcon project: " PHALCONURL
+if [ -n "$PHALCONURL" ]; then
+    printf "\n\nConfiguring the cphalcon project..\n"
+    cd cphalcon
+    git remote rename origin upstream
+    git remote add origin $PHALCONURL
+    git pull origin master
+    git reset --hard HEAD
+else
+    printf "\n\nSkipping cphalcon configuration.\n"
+fi
+
+printf "\n"
+read -e -p "Enter the URL to your fork of the devtools project: " DEVURL
+if [ -n "$DEVURL" ]; then
+    printf "\n\nConfiguring the devtools project..\n"
+    cd ../phalcon-devtools
+    git remote rename origin upstream
+    git remote add origin $DEVURL
+    git pull origin master
+    git reset --hard HEAD
+else
+    printf "\n\nSkipping devtools configuration.\n"
+fi
+
+printf "\n"
+read -e -p "Enter the URL to your fork of the incubator project: " DEVURL
+if [ -n "$DEVURL" ]; then
+    printf "\n\nConfiguring the incubator project..\n"
+    cd ../incubator
+    git remote rename origin upstream
+    git remote add origin $DEVURL
+    git pull origin master
+    git reset --hard HEAD
+else
+    printf "\n\nSkipping devtools configuration.\n"
+fi
+
+printf "Setting up a fresh phalcon project.. "
+rm -rf site/
+./phalcon project site
+sed -i "s/''/'123'/g" site/app/config/config.php
+sed -i "s/'test'/'phalcon'/g" site/app/config/config.php
+printf "done!\n"
+
+printf "Setting up a fresh db.. "
+mysql -u root -p123 phalcon < phalcon.sql
+printf "done!\n"
+
+printf "\n\nAll set up! make sure to map phalcontest.dev to $IP in your hosts file.\n"
+printf "\n . - project folder"
+printf "\n |"
+printf "\n +- cphalcon   <- contains the php module."
+printf "\n |"
+printf "\n +- phalcon-devtools   <- contains the devtools git repository"
+printf "\n |"
+printf "\n +- incubator  <- contains the incubator project"
+printf "\n |"
+printf "\n +- site   <- contains the base project"
+printf "\n\n"
